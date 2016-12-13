@@ -647,7 +647,8 @@ public class ThriftHiveMetastore
         if (tablePrivileges == null || tablePrivileges.size() == 0) {
             final Set<HivePrivilegeInfo> databasePrivileges = getDatabasePrivileges(user, databaseName);
             privileges.addAll(databasePrivileges);
-        }else {
+        }
+        else {
             privileges.addAll(tablePrivileges);
         }
         return privileges.build();
