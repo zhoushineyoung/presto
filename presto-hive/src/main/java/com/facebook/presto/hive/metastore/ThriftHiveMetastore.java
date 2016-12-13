@@ -638,12 +638,18 @@ public class ThriftHiveMetastore
     public Set<HivePrivilegeInfo> getTablePrivileges(String user, String databaseName, String tableName)
     {
         ImmutableSet.Builder<HivePrivilegeInfo> privileges = ImmutableSet.builder();
-
-        if (isTableOwner(user, databaseName, tableName)) {
+        boolean isTableOwner = isTableOwner(user, databaseName, tableName);
+        if (isTableOwner) {
             privileges.add(new HivePrivilegeInfo(OWNERSHIP, true));
         }
-        privileges.addAll(getPrivileges(user, new HiveObjectRef(HiveObjectType.TABLE, databaseName, tableName, null, null)));
 
+        Set<HivePrivilegeInfo> tablePrivileges = getPrivileges(user, new HiveObjectRef(HiveObjectType.TABLE, databaseName, tableName, null, null));
+        if (tablePrivileges == null || tablePrivileges.size() == 0) {
+            final Set<HivePrivilegeInfo> databasePrivileges = getDatabasePrivileges(user, databaseName);
+            privileges.addAll(databasePrivileges);
+        }else {
+            privileges.addAll(tablePrivileges);
+        }
         return privileges.build();
     }
 
